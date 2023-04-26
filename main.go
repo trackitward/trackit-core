@@ -56,8 +56,8 @@ type File struct {
 			Student_Ta_Name   string      `json:"student_ta_name"`
 			Student_Ta_Number json.Number `json:"student_ta_number"`
 		} `json:"student_data"`
-		Course_Data struct {
-			Courses []User_Course `json:"user_course"`
+		Course_Data []struct {
+			UserCourse User_Course `json:"user_course"`
 		} `json:"course_data"`
 		Unit_Data struct {
 			Units_Completed   json.Number `json:"units_completed"`
@@ -139,6 +139,22 @@ func createUser(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(file)
 }
 
+func getTestUser(response http.ResponseWriter, request *http.Request) {
+	json_file, err := os.Open("test.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer json_file.Close()
+
+	byteValue, _ := ioutil.ReadAll(json_file)
+
+	var file *File
+
+	json.Unmarshal(byteValue, &file)
+	fmt.Println(file)
+	json.NewEncoder(response).Encode(file)
+}
+
 func notFound(response http.ResponseWriter, request *http.Request) {
 	result := `{"status": 404, "message": "404 NOT FOUND"}`
 
@@ -149,7 +165,7 @@ func notFound(response http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
-	createTestUser()
+	//createTestUser()
 	fmt.Println("Starting ByteTrack API...")
 
 	route := mux.NewRouter()
@@ -158,6 +174,7 @@ func main() {
 	router := cors.Default().Handler(route)
 
 	route.HandleFunc("/user/post/create", createUser).Methods("POST")
+	route.HandleFunc("/user/get/test", getTestUser).Methods(("GET"))
 	route.NotFoundHandler = http.HandlerFunc(notFound)
 
 	http.ListenAndServe(":31475", router)
