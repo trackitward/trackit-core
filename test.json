@@ -1,0 +1,89 @@
+{
+    "meta": {
+        "user_file_version": "",
+        "creation_date": "",
+        "last_logged_in": ""
+    },
+    "data":{
+        "student_data":{
+            "student_name":"",
+            "student_number":"",
+            "student_grade":0,
+            "student_ta_name":"",
+            "student_ta_number":0
+        },
+        "course_data":[
+            {
+                "user_course": {
+                    "course_info":{
+                        "course_code": "",
+                        "course_name": "",
+                        "course_teacher": "",
+                        "course_total_units": ""
+                    },
+                    "user_section": 0,
+                    "user_info": {
+                        "units_completed_number": 0,
+                        "units_uncompleted_number": 0,
+                        "units": [
+                            {
+                                "course_code": "",
+                                "course_name":"",
+                                "course_section":0,
+                                "unit_number": 0,
+                                "unit_completed": true,
+                                "submission_date": "test"
+                            },
+                            {
+                                "course_code": "",
+                                "course_name":"",
+                                "course_section":0,
+                                "unit_number": 0,
+                                "unit_completed": true,
+                                "submission_date": "test"
+                            },
+                            {
+                                "course_code": "",
+                                "course_name":"",
+                                "course_section":0,
+                                "unit_number": 0,
+                                "unit_completed": true,
+                                "submission_date": "test"
+                            },
+                            {
+                                "course_code": "",
+                                "course_name":"",
+                                "course_section":0,
+                                "unit_number": 0,
+                                "unit_completed": true,
+                                "submission_date": "test"
+                            },
+                            {
+                                "course_code": "",
+                                "course_name":"",
+                                "course_section":0,
+                                "unit_number": 0,
+                                "unit_completed": true,
+                                "submission_date": "test"
+                            },
+                            {
+                                "course_code": "",
+                                "course_name":"",
+                                "course_section":0,
+                                "unit_number": 0,
+                                "unit_completed": true,
+                                "submission_date": "test"
+                            }
+                        ],
+                        "last_unit_date": ""
+                    }
+                }
+            }
+        ],
+        "unit_data": {
+            "units_completed":0,
+            "units_uncompleted": 0,
+            "units_total":0
+        }
+    }
+}

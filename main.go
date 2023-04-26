@@ -16,31 +16,30 @@ import (
 var path_to_data = "../data/"
 
 type Unit struct {
-	Class_Code      string      `json:"class_code"`
-	Class_Name      string      `json:"class_name"`
-	Class_Section   json.Number `json:"class_section"`
+	Course_Code     string      `json:"course_code"`
+	Course_Name     string      `json:"course_name"`
+	Course_Section  json.Number `json:"course_section"`
 	Unit_Number     json.Number `json:"unit_number"`
 	Unit_Completed  bool        `json:"unit_completed"`
 	Submission_Date string      `json:"submission_date"`
 }
 
-type Class struct {
-	Class_Code        string `json:"class_code"`
-	Class_Name        string `json:"class_name"`
-	Class_Teacher     string `json:"class_teacher"`
-	Class_Total_Units string `json:"class_total_units"`
+type Course struct {
+	Course_Code        string `json:"course_code"`
+	Course_Name        string `json:"course_name"`
+	Course_Teacher     string `json:"course_teacher"`
+	Course_Total_Units string `json:"course_total_units"`
 }
 
-type User_Class struct {
-	Class_Info   Class       `json:"class"`
+type User_Course struct {
+	Course_Info  Course      `json:"course_info"`
 	User_Section json.Number `json:"user_section"`
 	User_Info    struct {
 		Units_Completed_Number   json.Number `json:"units_completed_number"`
 		Units_Uncompleted_Number json.Number `json:"units_uncompleted_number"`
-		Units_Completed          []Unit      `json:"units_completed"`
-		Units_Uncompleted        []Unit      `json:"units_uncompleted"`
-		Last_Unit_Date           string      `json:"Last_Unit_Date"`
-	}
+		Units                    []Unit      `json:"units"`
+		Last_Unit_Date           string      `json:"last_unit_date"`
+	} `json:"user_info"`
 }
 
 type File struct {
@@ -48,7 +47,7 @@ type File struct {
 		User_File_Version string `json:"user_file_version"`
 		Creation_Date     string `json:"creation_date"`
 		Last_Logged_In    string `json:"last_logged_in"`
-	}
+	} `json:"meta"`
 	Data struct {
 		Student_Data struct {
 			Student_Name      string      `json:"student_name"`
@@ -56,15 +55,46 @@ type File struct {
 			Student_Grade     json.Number `json:"student_grade"`
 			Student_Ta_Name   string      `json:"student_ta_name"`
 			Student_Ta_Number json.Number `json:"student_ta_number"`
-		}
-		Class_Data struct {
-			Classes []Class `json:"classes"`
-		}
+		} `json:"student_data"`
+		Course_Data struct {
+			Courses []User_Course `json:"user_course"`
+		} `json:"course_data"`
 		Unit_Data struct {
 			Units_Completed   json.Number `json:"units_completed"`
 			Units_Uncompleted json.Number `json:"units_uncompleted"`
 			Units_Total       json.Number `json:"units_total"`
-		}
+		} `json:"unit_data"`
+	} `json:"data"`
+}
+
+func createTestUser() {
+	var file *File
+
+	jsonFile, err := os.Open("test.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+
+	newerr := json.Unmarshal(byteValue, &file)
+	if newerr != nil {
+		log.Fatal(newerr)
+	}
+
+	name := string(path_to_data + "123" + ".json")
+
+	if _, err := os.Stat(name); err == nil {
+		log.Fatal("Exists")
+	} else if os.IsNotExist(err) {
+		os.Create(name)
+
+		file_out, _ := json.MarshalIndent(file, "", "    ")
+
+		_ = ioutil.WriteFile(name, file_out, 0644)
+		return
+	} else {
+		log.Fatal(err)
+		return
 	}
 }
 
@@ -119,6 +149,7 @@ func notFound(response http.ResponseWriter, request *http.Request) {
 }
 
 func main() {
+	createTestUser()
 	fmt.Println("Starting ByteTrack API...")
 
 	route := mux.NewRouter()
