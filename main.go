@@ -67,37 +67,6 @@ type File struct {
 	} `json:"data"`
 }
 
-func createTestUser() {
-	var file *File
-
-	jsonFile, err := os.Open("test.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-
-	newerr := json.Unmarshal(byteValue, &file)
-	if newerr != nil {
-		log.Fatal(newerr)
-	}
-
-	name := string(path_to_data + "123" + ".json")
-
-	if _, err := os.Stat(name); err == nil {
-		log.Fatal("Exists")
-	} else if os.IsNotExist(err) {
-		os.Create(name)
-
-		file_out, _ := json.MarshalIndent(file, "", "    ")
-
-		_ = ioutil.WriteFile(name, file_out, 0644)
-		return
-	} else {
-		log.Fatal(err)
-		return
-	}
-}
-
 func createUser(response http.ResponseWriter, request *http.Request) {
 	if request.Header.Get("API-PASS") != "PASSTOAPI-TRACKER" {
 		http.Error(response, "Unauthorized", http.StatusUnauthorized)
