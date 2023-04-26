@@ -7,13 +7,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"golang.org/x/time/rate"
 )
 
-var path_to_data = "../data/"
+var path_to_data = "./data/"
 
 type Unit struct {
 	Course_Code     string      `json:"course_code"`
@@ -124,6 +125,88 @@ func getTestUser(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(file)
 }
 
+func getStudentData(response http.ResponseWriter, request *http.Request) {
+	params := mux.Vars(request)
+	id := params["id"]
+	info := params["info"]
+	course_code := params["course_code"]
+
+	if _, err := os.Stat(path_to_data + id + ".json"); err == nil {
+		json_file, err := os.Open("./data/" + id + ".json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer json_file.Close()
+
+		byteValue, _ := ioutil.ReadAll(json_file)
+
+		var file File
+
+		json.Unmarshal(byteValue, &file)
+
+		if info == "all_data" {
+			json.NewEncoder(response).Encode(file)
+		} else if info == "student_data" {
+			json.NewEncoder(response).Encode(file.Data.Student_Data)
+		} else if info == "all_courses" {
+			json.NewEncoder(response).Encode(file.Data.Course_Data)
+		} else if info == "unit_data" {
+			json.NewEncoder(response).Encode(file.Data.Unit_Data)
+		} else if info == "course_code" {
+			for i := 0; i < len(file.Data.Course_Data); i++ {
+				if file.Data.Course_Data[i].UserCourse.Course_Info.Course_Code == strings.ToUpper(course_code) {
+					json.NewEncoder(response).Encode(file.Data.Course_Data)
+				}
+			}
+		} else {
+			result := `{"status":404, "message":"Wrong parameter included. Query /endpoints for all acceptable endpoints/params."}`
+			var finalResult map[string]interface{}
+			json.Unmarshal([]byte(result), &finalResult)
+			json.NewEncoder(response).Encode(finalResult)
+		}
+
+	} else if os.IsNotExist(err) {
+		result := `{"status":404, "message":"User does not exist."}`
+		var finalResult map[string]interface{}
+		json.Unmarshal([]byte(result), &finalResult)
+
+		json.NewEncoder(response).Encode(finalResult)
+	}
+}
+
+func getStudentCourseData(response http.ResponseWriter, request *http.Request) {
+	params := mux.Vars(request)
+	id := params["id"]
+	course_code := params["course_code"]
+
+	if _, err := os.Stat(path_to_data + id + ".json"); err == nil {
+		json_file, err := os.Open("./data/" + id + ".json")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer json_file.Close()
+
+		byteValue, _ := ioutil.ReadAll(json_file)
+
+		var file File
+
+		json.Unmarshal(byteValue, &file)
+
+		for i := 0; i < len(file.Data.Course_Data); i++ {
+			if file.Data.Course_Data[i].UserCourse.Course_Info.Course_Code == strings.ToUpper(course_code) {
+				json.NewEncoder(response).Encode(file.Data.Course_Data)
+			}
+		}
+
+	} else if os.IsNotExist(err) {
+		result := `{"status": 404, "message":"User does not exist."}`
+		var finalResult map[string]interface{}
+		json.Unmarshal([]byte(result), &finalResult)
+
+		json.NewEncoder(response).Encode(finalResult)
+	}
+}
+
 func notFound(response http.ResponseWriter, request *http.Request) {
 	result := `{"status": 404, "message": "404 NOT FOUND"}`
 
@@ -142,8 +225,12 @@ func main() {
 
 	router := cors.Default().Handler(route)
 
+	//GET ROUTES
+	route.HandleFunc("/get/user/test", getTestUser).Methods("GET")
+	route.HandleFunc("/get/user/{id}/{info}", getStudentData).Methods("GET")
+	route.HandleFunc("/get/user/{id}/{info}/{course_code}", getStudentData).Methods("GET")
+
 	route.HandleFunc("/user/post/create", createUser).Methods("POST")
-	route.HandleFunc("/user/get/test", getTestUser).Methods(("GET"))
 	route.NotFoundHandler = http.HandlerFunc(notFound)
 
 	http.ListenAndServe(":31475", router)
