@@ -4,7 +4,7 @@ import json
 
 base_url = "http://localhost:31475"
 
-for i in range(2):
+for i in range(30):
     first_names = []
     last_names = []
 
@@ -50,8 +50,8 @@ for i in range(2):
 
             units = []
 
-            units_completed = random.randint(0, number_of_courses*course_total_units)
-            units_uncompleted = number_of_courses*course_total_units - units_completed
+            units_completed = random.randint(0, course_total_units)
+            units_uncompleted = course_total_units - units_completed
 
             total_units_completed += units_completed
             total_units_uncompleted += units_uncompleted
@@ -114,7 +114,7 @@ for i in range(2):
         }
     }
 
-    print(data)
+    #print(data)
 
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'API-PASS': 'PASSTOAPI-TRACKER'}
     response = requests.post(base_url + "/post/user/create", data=json.dumps(data), headers=headers)

@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
@@ -66,6 +67,15 @@ type File struct {
 			Units_Total       json.Number `json:"units_total"`
 		} `json:"unit_data"`
 	} `json:"data"`
+}
+
+type UnitSubmission struct {
+	Code            string      `json:"code,omitempty"`
+	Date            string      `json:"date"`
+	Student_Name    string      `json:"student_name"`
+	Course_Code     string      `json:"course_code"`
+	Student_Section json.Number `json:"student_section"`
+	Unit_Number     json.Number `json:"unit_number"`
 }
 
 func createUser(response http.ResponseWriter, request *http.Request) {
@@ -156,7 +166,7 @@ func getStudentData(response http.ResponseWriter, request *http.Request) {
 		} else if info == "course_code" {
 			for i := 0; i < len(file.Data.Course_Data); i++ {
 				if file.Data.Course_Data[i].UserCourse.Course_Info.Course_Code == strings.ToUpper(course_code) {
-					json.NewEncoder(response).Encode(file.Data.Course_Data)
+					json.NewEncoder(response).Encode(file.Data.Course_Data[i])
 				}
 			}
 		} else {
@@ -173,6 +183,47 @@ func getStudentData(response http.ResponseWriter, request *http.Request) {
 
 		json.NewEncoder(response).Encode(finalResult)
 	}
+}
+
+func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Request) {
+
+	body, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var unitSubmission *UnitSubmission
+
+	unmarshal_err := json.Unmarshal(body, &unitSubmission)
+	if unmarshal_err != nil {
+		fmt.Print(unmarshal_err)
+		http.Error(response, "Bad Request - Wrong Body", http.StatusBadRequest)
+		return
+	}
+
+	code := fmt.Sprint(time.Now().Nanosecond())[:6]
+
+	unitSubmission.Code = code
+
+	fmt.Println(code, unitSubmission)
+
+	f, err := os.Open("units-in-submission.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	byteValue, _ := ioutil.ReadAll(f)
+
+	// Write current state to slice
+	curr := []UnitSubmission{}
+	json.Unmarshal(byteValue, &curr)
+
+	// Append data to the created slice
+	curr = append(curr, *unitSubmission)
+	JSON, _ := json.MarshalIndent(curr, "", "    ")
+
+	// Write
+	_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
 }
 
 func notFound(response http.ResponseWriter, request *http.Request) {
@@ -199,6 +250,7 @@ func main() {
 	route.HandleFunc("/get/user/{id}/{info}/{course_code}", getStudentData).Methods("GET")
 
 	route.HandleFunc("/post/user/create", createUser).Methods("POST")
+	route.HandleFunc("/post/unit/submit", generateUnitSubmissionCode).Methods("POST")
 	route.NotFoundHandler = http.HandlerFunc(notFound)
 
 	http.ListenAndServe(":31475", router)
@@ -206,7 +258,7 @@ func main() {
 
 func commonMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-		fmt.Print(request.URL.Path)
+		fmt.Println(request.URL.Path)
 
 		var globallimiter = rate.NewLimiter(50, 110)
 
