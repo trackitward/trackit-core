@@ -230,7 +230,6 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 }
 
 func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
-
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -259,6 +258,45 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 	for i := 0; i < len(curr); i++ {
 		if curr[i].Code == code {
 			fmt.Println("CODE VALIDATED")
+
+			if _, err := os.Stat(path_to_data + curr[i].Student_Number + ".json"); err == nil {
+				json_file, err := os.Open("./data/" + curr[i].Student_Number + ".json")
+				if err != nil {
+					log.Fatal(err)
+				}
+				defer json_file.Close()
+
+				byteValue, _ := ioutil.ReadAll(json_file)
+
+				var file File
+
+				json.Unmarshal(byteValue, &file)
+
+				for j := 0; j < len(file.Data.Course_Data); j++ {
+					if file.Data.Course_Data[j].UserCourse.Course_Info.Course_Code == curr[i].Course_Code {
+						for k := 0; k < len(file.Data.Course_Data[j].UserCourse.User_Info.Units); k++ {
+							if file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Number == curr[i].Unit_Number {
+								file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Completed = true
+							}
+						}
+					}
+				}
+
+				name := string(path_to_data + file.Data.Student_Data.Student_Number + ".json")
+
+				file_out, _ := json.MarshalIndent(file, "", "    ")
+
+				_ = ioutil.WriteFile(name, file_out, 0644)
+				response.WriteHeader(http.StatusCreated)
+				json.NewEncoder(response).Encode(file)
+
+			} else if os.IsNotExist(err) {
+				result := `{"status":404, "message":"User does not exist."}`
+				var finalResult map[string]interface{}
+				json.Unmarshal([]byte(result), &finalResult)
+
+				json.NewEncoder(response).Encode(finalResult)
+			}
 
 			curr[i] = curr[len(curr)-1]
 			curr = curr[:len(curr)-1]

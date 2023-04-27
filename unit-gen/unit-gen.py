@@ -7,7 +7,7 @@ data = {
     "student_number": "973419933",
     "course_code": "ENG4U1",
     "student_section": 2,
-    "unit_number": 3
+    "unit_number": 6
 }
 
 response = requests.post('http://localhost:31475/post/unit/submit', data=json.dumps(data))
