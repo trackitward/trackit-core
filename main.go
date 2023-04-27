@@ -26,10 +26,10 @@ type Unit struct {
 }
 
 type Course struct {
-	Course_Code        string `json:"course_code"`
-	Course_Name        string `json:"course_name"`
-	Course_Teacher     string `json:"course_teacher"`
-	Course_Total_Units string `json:"course_total_units"`
+	Course_Code        string      `json:"course_code"`
+	Course_Name        string      `json:"course_name"`
+	Course_Teacher     string      `json:"course_teacher"`
+	Course_Total_Units json.Number `json:"course_total_units"`
 }
 
 type User_Course struct {
@@ -83,6 +83,7 @@ func createUser(response http.ResponseWriter, request *http.Request) {
 
 	unmarshal_err := json.Unmarshal(body, &file)
 	if unmarshal_err != nil {
+		fmt.Print(unmarshal_err)
 		http.Error(response, "Bad Request - Wrong Body", http.StatusBadRequest)
 		return
 	}
@@ -174,39 +175,6 @@ func getStudentData(response http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func getStudentCourseData(response http.ResponseWriter, request *http.Request) {
-	params := mux.Vars(request)
-	id := params["id"]
-	course_code := params["course_code"]
-
-	if _, err := os.Stat(path_to_data + id + ".json"); err == nil {
-		json_file, err := os.Open("./data/" + id + ".json")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer json_file.Close()
-
-		byteValue, _ := ioutil.ReadAll(json_file)
-
-		var file File
-
-		json.Unmarshal(byteValue, &file)
-
-		for i := 0; i < len(file.Data.Course_Data); i++ {
-			if file.Data.Course_Data[i].UserCourse.Course_Info.Course_Code == strings.ToUpper(course_code) {
-				json.NewEncoder(response).Encode(file.Data.Course_Data)
-			}
-		}
-
-	} else if os.IsNotExist(err) {
-		result := `{"status": 404, "message":"User does not exist."}`
-		var finalResult map[string]interface{}
-		json.Unmarshal([]byte(result), &finalResult)
-
-		json.NewEncoder(response).Encode(finalResult)
-	}
-}
-
 func notFound(response http.ResponseWriter, request *http.Request) {
 	result := `{"status": 404, "message": "404 NOT FOUND"}`
 
@@ -230,7 +198,7 @@ func main() {
 	route.HandleFunc("/get/user/{id}/{info}", getStudentData).Methods("GET")
 	route.HandleFunc("/get/user/{id}/{info}/{course_code}", getStudentData).Methods("GET")
 
-	route.HandleFunc("/user/post/create", createUser).Methods("POST")
+	route.HandleFunc("/post/user/create", createUser).Methods("POST")
 	route.NotFoundHandler = http.HandlerFunc(notFound)
 
 	http.ListenAndServe(":31475", router)
