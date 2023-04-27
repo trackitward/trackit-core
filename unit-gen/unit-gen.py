@@ -3,12 +3,19 @@ import json
 
 data = {
     "date": "TEST",
-    "student_name": "RNA",
-    "course_code": "RZZ4U1",
-    "student_section": 4,
-    "unit_number": 1
+    "student_name": "Ruth Martin",
+    "student_number": "973419933",
+    "course_code": "ENG4U1",
+    "student_section": 2,
+    "unit_number": 3
 }
 
 response = requests.post('http://localhost:31475/post/unit/submit', data=json.dumps(data))
 
-print(response.text)
+print(response.json())
+
+code = input('enter the code: ')
+
+response2 = requests.post('http://localhost:31475/post/unit/submit/validate', data=json.dumps(code))
+
+print(response.json())

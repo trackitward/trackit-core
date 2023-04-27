@@ -72,6 +72,7 @@ type File struct {
 type UnitSubmission struct {
 	Code            string      `json:"code,omitempty"`
 	Date            string      `json:"date"`
+	Student_Number  string      `json:"student_number"`
 	Student_Name    string      `json:"student_name"`
 	Course_Code     string      `json:"course_code"`
 	Student_Section json.Number `json:"student_section"`
@@ -224,6 +225,50 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 
 	// Write
 	_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
+
+	json.NewEncoder(response).Encode(code)
+}
+
+func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
+
+	body, err := ioutil.ReadAll(request.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var code string
+
+	unmarshal_err := json.Unmarshal(body, &code)
+	if unmarshal_err != nil {
+		fmt.Print(unmarshal_err)
+		http.Error(response, "Bad Request - Wrong Body", http.StatusBadRequest)
+		return
+	}
+
+	f, err := os.Open("units-in-submission.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	byteValue, _ := ioutil.ReadAll(f)
+
+	// Write current state to slice
+	curr := []UnitSubmission{}
+	json.Unmarshal(byteValue, &curr)
+
+	for i := 0; i < len(curr); i++ {
+		if curr[i].Code == code {
+			fmt.Println("CODE VALIDATED")
+
+			curr[i] = curr[len(curr)-1]
+			curr = curr[:len(curr)-1]
+			JSON, _ := json.MarshalIndent(curr, "", "    ")
+
+			// Write
+			_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
+		}
+	}
+
 }
 
 func notFound(response http.ResponseWriter, request *http.Request) {
@@ -251,6 +296,7 @@ func main() {
 
 	route.HandleFunc("/post/user/create", createUser).Methods("POST")
 	route.HandleFunc("/post/unit/submit", generateUnitSubmissionCode).Methods("POST")
+	route.HandleFunc("/post/unit/submit/validate", acceptUnitSubmission).Methods("POST")
 	route.NotFoundHandler = http.HandlerFunc(notFound)
 
 	http.ListenAndServe(":31475", router)
