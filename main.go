@@ -209,8 +209,6 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 	unitSubmission.Ticks = int(time.Now().Unix())
 	unitSubmission.Expiry = 120
 
-	fmt.Println(code, unitSubmission)
-
 	f, err := os.Open("units-in-submission.json")
 	if err != nil {
 		log.Fatal(err)
@@ -221,6 +219,17 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 	// Write current state to slice
 	curr := []UnitSubmission{}
 	json.Unmarshal(byteValue, &curr)
+
+	for _, current := range curr {
+		if current.Code == code {
+			code = fmt.Sprint(time.Now().Nanosecond())[:6]
+			for _, current := range curr {
+				if current.Code == code {
+					code = fmt.Sprint(time.Now().Nanosecond())[:6]
+				}
+			}
+		}
+	}
 
 	// Append data to the created slice
 	curr = append(curr, *unitSubmission)
@@ -288,14 +297,27 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 
 				json.Unmarshal(byteValue, &file)
 
+				unit_status := false
+
 				for j := 0; j < len(file.Data.Course_Data); j++ {
 					if file.Data.Course_Data[j].UserCourse.Course_Info.Course_Code == curr[i].Course_Code {
 						for k := 0; k < len(file.Data.Course_Data[j].UserCourse.User_Info.Units); k++ {
 							if file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Number == curr[i].Unit_Number {
 								file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Completed = true
+								unit_status = true
 							}
 						}
 					}
+				}
+
+				if !unit_status {
+					result := `{"status":404, "message":"Course/Unit does not exist."}`
+					var finalResult map[string]interface{}
+					json.Unmarshal([]byte(result), &finalResult)
+
+					json.NewEncoder(response).Encode(finalResult)
+					response.Header().Add("UNIT-SUBMISSION", "FAILED")
+					return
 				}
 
 				name := string(path_to_data + file.Data.Student_Data.Student_Number + ".json")
@@ -312,6 +334,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 				json.Unmarshal([]byte(result), &finalResult)
 
 				json.NewEncoder(response).Encode(finalResult)
+				response.Header().Add("UNIT-SUBMISSION", "FAILED")
 				return
 			}
 

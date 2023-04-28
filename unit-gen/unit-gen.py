@@ -5,7 +5,7 @@ data = {
     "date": "TEST",
     "student_name": "Diana Hodges",
     "student_number": "110880792",
-    "course_code": "HRE4M1",
+    "course_code": "TST121",
     "student_section": 1,
     "unit_number": 3
 }
