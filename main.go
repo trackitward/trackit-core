@@ -311,6 +311,12 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 				}
 
 				if !unit_status {
+					curr[i] = curr[len(curr)-1]
+					curr = curr[:len(curr)-1]
+					JSON, _ := json.MarshalIndent(curr, "", "    ")
+
+					// Write
+					_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
 					result := `{"status":404, "message":"Course/Unit does not exist."}`
 					var finalResult map[string]interface{}
 					json.Unmarshal([]byte(result), &finalResult)
