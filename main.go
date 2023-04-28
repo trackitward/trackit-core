@@ -62,9 +62,9 @@ type File struct {
 			UserCourse User_Course `json:"user_course"`
 		} `json:"course_data"`
 		Unit_Data struct {
-			Units_Completed   json.Number `json:"units_completed"`
-			Units_Uncompleted json.Number `json:"units_uncompleted"`
-			Units_Total       json.Number `json:"units_total"`
+			Units_Completed   int `json:"units_completed"`
+			Units_Uncompleted int `json:"units_uncompleted"`
+			Units_Total       int `json:"units_total"`
 		} `json:"unit_data"`
 	} `json:"data"`
 }
@@ -304,6 +304,10 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 						for k := 0; k < len(file.Data.Course_Data[j].UserCourse.User_Info.Units); k++ {
 							if file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Number == curr[i].Unit_Number {
 								file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Completed = true
+								file.Data.Course_Data[j].UserCourse.User_Info.Units_Completed_Number += json.Number(fmt.Sprint(1))
+								file.Data.Course_Data[j].UserCourse.User_Info.Units_Uncompleted_Number += json.Number(fmt.Sprint(-1))
+								file.Data.Unit_Data.Units_Completed += 1
+								file.Data.Unit_Data.Units_Uncompleted -= 1
 								unit_status = true
 							}
 						}
