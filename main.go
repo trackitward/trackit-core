@@ -72,11 +72,13 @@ type File struct {
 type UnitSubmission struct {
 	Code            string      `json:"code,omitempty"`
 	Date            string      `json:"date"`
+	Ticks           int         `json:"ticks,omitempty"`
 	Student_Number  string      `json:"student_number"`
 	Student_Name    string      `json:"student_name"`
 	Course_Code     string      `json:"course_code"`
 	Student_Section json.Number `json:"student_section"`
 	Unit_Number     json.Number `json:"unit_number"`
+	Expiry          int         `json:"expiry,omitempty"`
 }
 
 func createUser(response http.ResponseWriter, request *http.Request) {
@@ -187,7 +189,6 @@ func getStudentData(response http.ResponseWriter, request *http.Request) {
 }
 
 func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Request) {
-
 	body, err := ioutil.ReadAll(request.Body)
 	if err != nil {
 		log.Fatal(err)
@@ -205,6 +206,8 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 	code := fmt.Sprint(time.Now().Nanosecond())[:6]
 
 	unitSubmission.Code = code
+	unitSubmission.Ticks = int(time.Now().Unix())
+	unitSubmission.Expiry = 120
 
 	fmt.Println(code, unitSubmission)
 
@@ -257,8 +260,21 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 
 	for i := 0; i < len(curr); i++ {
 		if curr[i].Code == code {
-			fmt.Println("CODE VALIDATED")
+			if curr[i].Ticks+int(curr[i].Expiry) < int(time.Now().Unix()) {
+				result := `{"status":400, "message":"Code Expired."}`
+				var finalResult map[string]interface{}
+				json.Unmarshal([]byte(result), &finalResult)
 
+				curr[i] = curr[len(curr)-1]
+				curr = curr[:len(curr)-1]
+				JSON, _ := json.MarshalIndent(curr, "", "    ")
+
+				// Write
+				_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
+
+				json.NewEncoder(response).Encode(finalResult)
+				return
+			}
 			if _, err := os.Stat(path_to_data + curr[i].Student_Number + ".json"); err == nil {
 				json_file, err := os.Open("./data/" + curr[i].Student_Number + ".json")
 				if err != nil {
@@ -288,7 +304,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 
 				_ = ioutil.WriteFile(name, file_out, 0644)
 				response.WriteHeader(http.StatusCreated)
-				json.NewEncoder(response).Encode(file)
+				json.NewEncoder(response).Encode(file.Data.Unit_Data)
 
 			} else if os.IsNotExist(err) {
 				result := `{"status":404, "message":"User does not exist."}`
@@ -296,6 +312,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 				json.Unmarshal([]byte(result), &finalResult)
 
 				json.NewEncoder(response).Encode(finalResult)
+				return
 			}
 
 			curr[i] = curr[len(curr)-1]
@@ -306,7 +323,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 			_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
 		}
 	}
-
+	fmt.Println("CODE VALIDATED")
 }
 
 func notFound(response http.ResponseWriter, request *http.Request) {

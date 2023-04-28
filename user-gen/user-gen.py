@@ -62,7 +62,7 @@ for i in range(30):
                             "course_name": course_name,
                             "course_section": user_section,
                             "unit_number": i,
-                            "unit_completed": random.choice([True, False]),
+                            "unit_completed": False,
                             "submission_date": "DATE"
                         }
                 
