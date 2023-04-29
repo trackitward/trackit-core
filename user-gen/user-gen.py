@@ -4,7 +4,7 @@ import json
 
 base_url = "http://localhost:31475"
 
-for i in range(30):
+for i in range(3):
     first_names = []
     last_names = []
 
@@ -32,6 +32,7 @@ for i in range(30):
     number_of_courses = 8
 
     courses = []
+    true_courses = []
 
     total_units_completed = 0
     total_units_uncompleted = 0
@@ -70,14 +71,16 @@ for i in range(30):
             
             last_submission_date = "DATE"
 
+            true_course = {
+                            "course_code": course_code,
+                            "course_name": course_name,
+                            "course_teacher": course_teacher,
+                            "course_total_units": course_total_units
+                        }
+
             course = {
                         "user_course": {
-                            "course_info":{
-                                "course_code": course_code,
-                                "course_name": course_name,
-                                "course_teacher": course_teacher,
-                                "course_total_units": course_total_units
-                            },
+                            "course_info": true_courses,
                             "user_section": user_section,
                             "user_info": {
                                 "units_completed_number": units_completed,
@@ -88,6 +91,7 @@ for i in range(30):
                         }
                     }
             courses.append(course)
+            true_courses.append(true_course)
 
         
 
@@ -116,7 +120,13 @@ for i in range(30):
 
     #print(data)
 
+    data2 = {
+        "student_number": str(student_number),
+        "password": "TESTING123",
+        "courses": true_courses
+    }
+
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'API-PASS': 'PASSTOAPI-TRACKER'}
-    response = requests.post(base_url + "/post/user/create", data=json.dumps(data), headers=headers)
+    response = requests.post(base_url + "/post/user/profile/create", data=json.dumps(data2), headers=headers)
 
     print(response.text)

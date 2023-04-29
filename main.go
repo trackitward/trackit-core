@@ -10,7 +10,8 @@ import (
 	"golang.org/x/time/rate"
 )
 
-var path_to_data = "./data/"
+var path_to_data = "./data/units/"
+var path_to_profiles = "./data/profiles/"
 
 type Unit struct {
 	Course_Code     string      `json:"course_code"`
@@ -76,6 +77,13 @@ type UnitSubmission struct {
 	Expiry          int         `json:"expiry,omitempty"`
 }
 
+type UserProfile struct {
+	CreatedAt     int      `json:"created_at,omitempty"`
+	StudentNumber string   `json:"student_number"`
+	Password      string   `json:"password"`
+	Courses       []Course `json:"courses"`
+}
+
 func notFound(response http.ResponseWriter, request *http.Request) {
 	result := `{"status": 404, "message": "404 NOT FOUND"}`
 
@@ -100,6 +108,7 @@ func main() {
 	route.HandleFunc("/get/user/{id}/{info}/{course_code}", getStudentData).Methods("GET")
 
 	route.HandleFunc("/post/user/create", createUser).Methods("POST")
+	route.HandleFunc("/post/user/profile/create", createUserProfile).Methods("POST")
 	route.HandleFunc("/post/unit/submit", generateUnitSubmissionCode).Methods("POST")
 	route.HandleFunc("/post/unit/submit/validate", acceptUnitSubmission).Methods("POST")
 	route.NotFoundHandler = http.HandlerFunc(notFound)
