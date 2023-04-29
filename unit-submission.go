@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -11,7 +11,7 @@ import (
 )
 
 func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Request) {
-	body, err := ioutil.ReadAll(request.Body)
+	body, err := io.ReadAll(request.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +36,7 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 		log.Fatal(err)
 	}
 
-	byteValue, _ := ioutil.ReadAll(f)
+	byteValue, _ := io.ReadAll(f)
 
 	// Write current state to slice
 	curr := []UnitSubmission{}
@@ -58,13 +58,13 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 	JSON, _ := json.MarshalIndent(curr, "", "    ")
 
 	// Write
-	_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
+	_ = os.WriteFile("units-in-submission.json", JSON, 0644)
 
 	json.NewEncoder(response).Encode(code)
 }
 
 func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
-	body, err := ioutil.ReadAll(request.Body)
+	body, err := io.ReadAll(request.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +83,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 		log.Fatal(err)
 	}
 
-	byteValue, _ := ioutil.ReadAll(f)
+	byteValue, _ := io.ReadAll(f)
 
 	// Write current state to slice
 	curr := []UnitSubmission{}
@@ -101,7 +101,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 				JSON, _ := json.MarshalIndent(curr, "", "    ")
 
 				// Write
-				_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
+				_ = os.WriteFile("units-in-submission.json", JSON, 0644)
 
 				json.NewEncoder(response).Encode(finalResult)
 				return
@@ -113,7 +113,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 				}
 				defer json_file.Close()
 
-				byteValue, _ := ioutil.ReadAll(json_file)
+				byteValue, _ := io.ReadAll(json_file)
 
 				var file File
 
@@ -142,7 +142,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 					JSON, _ := json.MarshalIndent(curr, "", "    ")
 
 					// Write
-					_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
+					_ = os.WriteFile("units-in-submission.json", JSON, 0644)
 					result := `{"status":404, "message":"Course/Unit does not exist."}`
 					var finalResult map[string]interface{}
 					json.Unmarshal([]byte(result), &finalResult)
@@ -156,7 +156,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 
 				file_out, _ := json.MarshalIndent(file, "", "    ")
 
-				_ = ioutil.WriteFile(name, file_out, 0644)
+				_ = os.WriteFile(name, file_out, 0644)
 				response.WriteHeader(http.StatusCreated)
 				json.NewEncoder(response).Encode(file.Data.Unit_Data)
 
@@ -175,7 +175,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 			JSON, _ := json.MarshalIndent(curr, "", "    ")
 
 			// Write
-			_ = ioutil.WriteFile("units-in-submission.json", JSON, 0644)
+			_ = os.WriteFile("units-in-submission.json", JSON, 0644)
 		}
 	}
 	fmt.Println("CODE VALIDATED")

@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -18,7 +18,7 @@ func createUser(response http.ResponseWriter, request *http.Request) {
 		return
 	}
 
-	body, err := ioutil.ReadAll(request.Body)
+	body, err := io.ReadAll(request.Body)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func createUser(response http.ResponseWriter, request *http.Request) {
 
 		file_out, _ := json.MarshalIndent(file, "", "    ")
 
-		_ = ioutil.WriteFile(name, file_out, 0644)
+		_ = os.WriteFile(name, file_out, 0644)
 		response.WriteHeader(http.StatusCreated)
 		json.NewEncoder(response).Encode(file)
 		return
@@ -61,7 +61,7 @@ func getTestUser(response http.ResponseWriter, request *http.Request) {
 	}
 	defer json_file.Close()
 
-	byteValue, _ := ioutil.ReadAll(json_file)
+	byteValue, _ := io.ReadAll(json_file)
 
 	var file *File
 
@@ -83,7 +83,7 @@ func getStudentData(response http.ResponseWriter, request *http.Request) {
 		}
 		defer json_file.Close()
 
-		byteValue, _ := ioutil.ReadAll(json_file)
+		byteValue, _ := io.ReadAll(json_file)
 
 		var file File
 

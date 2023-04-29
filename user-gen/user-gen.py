@@ -29,7 +29,7 @@ for i in range(3):
     student_ta_name = random.choice(['Mrs.', 'Mr.']) + random.choice(last_names)
     student_ta_number = random.randint(0,69+1)
 
-    number_of_courses = 8
+    number_of_courses = 5
 
     courses = []
     true_courses = []
@@ -122,6 +122,7 @@ for i in range(3):
 
     data2 = {
         "student_number": str(student_number),
+        "email": "test@tcdsb.ca",
         "password": "TESTING123",
         "courses": true_courses
     }

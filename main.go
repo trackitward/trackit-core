@@ -80,8 +80,9 @@ type UnitSubmission struct {
 type UserProfile struct {
 	CreatedAt     int      `json:"created_at,omitempty"`
 	StudentNumber string   `json:"student_number"`
+	Email         string   `json:"email,omitempty"`
 	Password      string   `json:"password"`
-	Courses       []Course `json:"courses"`
+	Courses       []Course `json:"courses,omitempty"`
 }
 
 func notFound(response http.ResponseWriter, request *http.Request) {
@@ -109,6 +110,8 @@ func main() {
 
 	route.HandleFunc("/post/user/create", createUser).Methods("POST")
 	route.HandleFunc("/post/user/profile/create", createUserProfile).Methods("POST")
+	route.HandleFunc("/post/user/profile/auth", authorizeUser).Methods("POST")
+
 	route.HandleFunc("/post/unit/submit", generateUnitSubmissionCode).Methods("POST")
 	route.HandleFunc("/post/unit/submit/validate", acceptUnitSubmission).Methods("POST")
 	route.NotFoundHandler = http.HandlerFunc(notFound)
