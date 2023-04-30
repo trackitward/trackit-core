@@ -80,7 +80,7 @@ for i in range(3):
 
             course = {
                         "user_course": {
-                            "course_info": true_courses,
+                            "course_info": true_course,
                             "user_section": user_section,
                             "user_info": {
                                 "units_completed_number": units_completed,
@@ -128,6 +128,6 @@ for i in range(3):
     }
 
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain', 'API-PASS': 'PASSTOAPI-TRACKER'}
-    response = requests.post(base_url + "/post/user/profile/create", data=json.dumps(data2), headers=headers)
+    response = requests.post(base_url + "/post/user/create", data=json.dumps(data), headers=headers)
 
     print(response.text)

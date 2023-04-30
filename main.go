@@ -14,29 +14,29 @@ var path_to_data = "./data/units/"
 var path_to_profiles = "./data/profiles/"
 
 type Unit struct {
-	Course_Code     string      `json:"course_code"`
-	Course_Name     string      `json:"course_name"`
-	Course_Section  json.Number `json:"course_section"`
-	Unit_Number     json.Number `json:"unit_number"`
-	Unit_Completed  bool        `json:"unit_completed"`
-	Submission_Date string      `json:"submission_date"`
+	Course_Code     string `json:"course_code"`
+	Course_Name     string `json:"course_name"`
+	Course_Section  int    `json:"course_section"`
+	Unit_Number     int    `json:"unit_number"`
+	Unit_Completed  bool   `json:"unit_completed"`
+	Submission_Date string `json:"submission_date"`
 }
 
 type Course struct {
-	Course_Code        string      `json:"course_code"`
-	Course_Name        string      `json:"course_name"`
-	Course_Teacher     string      `json:"course_teacher"`
-	Course_Total_Units json.Number `json:"course_total_units"`
+	Course_Code        string `json:"course_code"`
+	Course_Name        string `json:"course_name"`
+	Course_Teacher     string `json:"course_teacher"`
+	Course_Total_Units int    `json:"course_total_units"`
 }
 
 type User_Course struct {
-	Course_Info  Course      `json:"course_info"`
-	User_Section json.Number `json:"user_section"`
+	Course_Info  Course `json:"course_info"`
+	User_Section int    `json:"user_section"`
 	User_Info    struct {
-		Units_Completed_Number   json.Number `json:"units_completed_number"`
-		Units_Uncompleted_Number json.Number `json:"units_uncompleted_number"`
-		Units                    []Unit      `json:"units"`
-		Last_Unit_Date           string      `json:"last_unit_date"`
+		Units_Completed_Number   int    `json:"units_completed_number"`
+		Units_Uncompleted_Number int    `json:"units_uncompleted_number"`
+		Units                    []Unit `json:"units"`
+		Last_Unit_Date           string `json:"last_unit_date"`
 	} `json:"user_info"`
 }
 
@@ -48,11 +48,11 @@ type File struct {
 	} `json:"meta"`
 	Data struct {
 		Student_Data struct {
-			Student_Name      string      `json:"student_name"`
-			Student_Number    string      `json:"student_number"`
-			Student_Grade     json.Number `json:"student_grade"`
-			Student_Ta_Name   string      `json:"student_ta_name"`
-			Student_Ta_Number json.Number `json:"student_ta_number"`
+			Student_Name      string `json:"student_name"`
+			Student_Number    string `json:"student_number"`
+			Student_Grade     int    `json:"student_grade"`
+			Student_Ta_Name   string `json:"student_ta_name"`
+			Student_Ta_Number int    `json:"student_ta_number"`
 		} `json:"student_data"`
 		Course_Data []struct {
 			UserCourse User_Course `json:"user_course"`
@@ -66,15 +66,15 @@ type File struct {
 }
 
 type UnitSubmission struct {
-	Code            string      `json:"code,omitempty"`
-	Date            string      `json:"date"`
-	Ticks           int         `json:"ticks,omitempty"`
-	Student_Number  string      `json:"student_number"`
-	Student_Name    string      `json:"student_name"`
-	Course_Code     string      `json:"course_code"`
-	Student_Section json.Number `json:"student_section"`
-	Unit_Number     json.Number `json:"unit_number"`
-	Expiry          int         `json:"expiry,omitempty"`
+	Code            string `json:"code,omitempty"`
+	Date            string `json:"date"`
+	Ticks           int    `json:"ticks,omitempty"`
+	Student_Number  string `json:"student_number"`
+	Student_Name    string `json:"student_name"`
+	Course_Code     string `json:"course_code"`
+	Student_Section int    `json:"student_section"`
+	Unit_Number     int    `json:"unit_number"`
+	Expiry          int    `json:"expiry,omitempty"`
 }
 
 type UserProfile struct {

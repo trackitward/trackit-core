@@ -107,13 +107,13 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 				return
 			}
 			if _, err := os.Stat(path_to_data + curr[i].Student_Number + ".json"); err == nil {
-				json_file, err := os.Open("./data/" + curr[i].Student_Number + ".json")
+				/*json_file, err := os.Open(path_to_data + curr[i].Student_Number + ".json")
 				if err != nil {
 					log.Fatal(err)
 				}
-				defer json_file.Close()
+				defer json_file.Close()*/
 
-				byteValue, _ := io.ReadAll(json_file)
+				byteValue, _ := os.ReadFile(path_to_data + curr[i].Student_Number + ".json")
 
 				var file File
 
@@ -126,8 +126,8 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 						for k := 0; k < len(file.Data.Course_Data[j].UserCourse.User_Info.Units); k++ {
 							if file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Number == curr[i].Unit_Number {
 								file.Data.Course_Data[j].UserCourse.User_Info.Units[k].Unit_Completed = true
-								file.Data.Course_Data[j].UserCourse.User_Info.Units_Completed_Number += json.Number(fmt.Sprint(1))
-								file.Data.Course_Data[j].UserCourse.User_Info.Units_Uncompleted_Number += json.Number(fmt.Sprint(-1))
+								file.Data.Course_Data[j].UserCourse.User_Info.Units_Completed_Number += 1
+								file.Data.Course_Data[j].UserCourse.User_Info.Units_Uncompleted_Number -= 1
 								file.Data.Unit_Data.Units_Completed += 1
 								file.Data.Unit_Data.Units_Uncompleted -= 1
 								unit_status = true
@@ -154,7 +154,10 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 
 				name := string(path_to_data + file.Data.Student_Data.Student_Number + ".json")
 
-				file_out, _ := json.MarshalIndent(file, "", "    ")
+				file_out, err := json.MarshalIndent(file, "", "    ")
+				if err != nil {
+					log.Fatal(err)
+				}
 
 				_ = os.WriteFile(name, file_out, 0644)
 				response.WriteHeader(http.StatusCreated)
@@ -176,7 +179,14 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 
 			// Write
 			_ = os.WriteFile("units-in-submission.json", JSON, 0644)
+			return
 		}
+		fmt.Println("CODE VALIDATED")
 	}
-	fmt.Println("CODE VALIDATED")
+	result := `{"status":404, "message":"Code does not exist."}`
+	var finalResult map[string]interface{}
+	json.Unmarshal([]byte(result), &finalResult)
+
+	json.NewEncoder(response).Encode(finalResult)
+	response.Header().Add("UNIT-SUBMISSION", "FAILED")
 }
