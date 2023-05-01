@@ -85,6 +85,16 @@ type UserProfile struct {
 	Courses       []Course `json:"courses,omitempty"`
 }
 
+type UnitConfirmation struct {
+	Date           string `json:"date"`
+	Student_Name   string `json:"student_name"`
+	Student_Grade  int    `json:"student_grade"`
+	Course_Code    string `json:"course_code"`
+	Course_Name    string `json:"course_name"`
+	Unit_Number    int    `json:"unit_number"`
+	Last_Submitted string `json:"last_submitted"`
+}
+
 func notFound(response http.ResponseWriter, request *http.Request) {
 	result := `{"status": 404, "message": "404 NOT FOUND"}`
 

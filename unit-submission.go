@@ -107,12 +107,6 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 				return
 			}
 			if _, err := os.Stat(path_to_data + curr[i].Student_Number + ".json"); err == nil {
-				/*json_file, err := os.Open(path_to_data + curr[i].Student_Number + ".json")
-				if err != nil {
-					log.Fatal(err)
-				}
-				defer json_file.Close()*/
-
 				byteValue, _ := os.ReadFile(path_to_data + curr[i].Student_Number + ".json")
 
 				var file File
@@ -159,10 +153,13 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 					log.Fatal(err)
 				}
 
-				_ = os.WriteFile(name, file_out, 0644)
-				response.WriteHeader(http.StatusCreated)
-				json.NewEncoder(response).Encode(file.Data.Unit_Data)
-
+				for j := 0; j < len(file.Data.Course_Data); j++ {
+					if file.Data.Course_Data[j].UserCourse.Course_Info.Course_Code == curr[i].Course_Code {
+						_ = os.WriteFile(name, file_out, 0644)
+						response.WriteHeader(http.StatusCreated)
+						json.NewEncoder(response).Encode(file.Data.Course_Data[j].UserCourse.User_Info.Units[curr[i].Unit_Number])
+					}
+				}
 			} else if os.IsNotExist(err) {
 				result := `{"status":404, "message":"User does not exist."}`
 				var finalResult map[string]interface{}

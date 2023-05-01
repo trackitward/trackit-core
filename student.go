@@ -77,7 +77,7 @@ func getStudentData(response http.ResponseWriter, request *http.Request) {
 	course_code := params["course_code"]
 
 	if _, err := os.Stat(path_to_data + id + ".json"); err == nil {
-		json_file, err := os.Open("./data/" + id + ".json")
+		json_file, err := os.Open(path_to_data + id + ".json")
 		if err != nil {
 			log.Fatal(err)
 		}
