@@ -3,11 +3,11 @@ import json
 
 data = {
     "date": "TEST",
-    "student_name": "Donna Luke",
-    "student_number": "554974039",
-    "course_code": "SBI4U1",
+    "student_name": "Amelia Hamilton",
+    "student_number": "147655378",
+    "course_code": "SCH4U1",
     "student_section": 8,
-    "unit_number": 2
+    "unit_number": 12
 }
 
 response = requests.post('http://localhost:31475/post/unit/submit', data=json.dumps(data))

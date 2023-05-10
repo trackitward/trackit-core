@@ -29,7 +29,7 @@ for i in range(3):
     student_ta_name = random.choice(['Mrs.', 'Mr.']) + random.choice(last_names)
     student_ta_number = random.randint(0,69+1)
 
-    number_of_courses = 5
+    number_of_courses = 8
 
     courses = []
     true_courses = []
@@ -57,7 +57,7 @@ for i in range(3):
             total_units_completed += units_completed
             total_units_uncompleted += units_uncompleted
 
-            for i in range(course_total_units):
+            for i in range(1, course_total_units+1):
                 unit = {
                             "course_code": course_code,
                             "course_name": course_name,
