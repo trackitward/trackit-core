@@ -24,7 +24,7 @@ for i in range(3):
 
         student_name = random.choice(first_names) + " " + random.choice(last_names)
 
-    student_number = random.randint(100000000, 999999999)
+    student_number = random.choice([123456789, 000000000, 777777777, 999999999, 987654321])
     student_grade = random.choice([9,10,11,12])
     student_ta_name = random.choice(['Mrs.', 'Mr.']) + random.choice(last_names)
     student_ta_number = random.randint(0,69+1)
