@@ -38,6 +38,28 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 
 	byteValue, _ := io.ReadAll(f)
 
+	file, err := os.Open("./data/units/" + unitSubmission.Student_Number + ".json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fileData, _ := io.ReadAll(file)
+
+	var studentFile *File
+
+	unmarshal_studentfile_err := json.Unmarshal(fileData, &studentFile)
+	if unmarshal_studentfile_err != nil {
+		fmt.Print(unmarshal_err)
+		http.Error(response, "Bad Request - Wrong Body", http.StatusBadRequest)
+		return
+	}
+
+	for current_iteration, _ := range studentFile.Data.Course_Data {
+		if studentFile.Data.Course_Data[current_iteration].UserCourse.Course_Info.Course_Code == unitSubmission.Course_Code {
+			unitSubmission.Last_Submitted = studentFile.Data.Course_Data[current_iteration].UserCourse.User_Info.Last_Unit_Date
+		}
+	}
+
 	// Write current state to slice
 	curr := []UnitSubmission{}
 	json.Unmarshal(byteValue, &curr)
@@ -165,6 +187,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 								file.Data.Course_Data[j].UserCourse.User_Info.Units_Uncompleted_Number -= 1
 								file.Data.Unit_Data.Units_Completed += 1
 								file.Data.Unit_Data.Units_Uncompleted -= 1
+								file.Data.Course_Data[j].UserCourse.User_Info.Last_Unit_Date = time.Now().Format("01-01-1970")
 								unit_status = true
 							}
 						}

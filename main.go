@@ -68,6 +68,7 @@ type File struct {
 type UnitSubmission struct {
 	Code            string `json:"code,omitempty"`
 	Date            string `json:"date"`
+	Last_Submitted  string `json:"last_submitted,omitempty"`
 	Ticks           int    `json:"ticks,omitempty"`
 	Student_Number  string `json:"student_number"`
 	Student_Name    string `json:"student_name"`
