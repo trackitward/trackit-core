@@ -40,8 +40,13 @@ for i in range(3):
     for i in range(number_of_courses):
         with open('courses.txt', 'r') as f:
             lines = f.readlines()
+            randomchoice = random.choice(lines)
+            lines.remove(randomchoice)
+            with open('courses.txt', 'w') as file2:
+                file2.write(''.join(lines))
+                file2.close()
 
-            course = random.choice(lines).split('-')
+            course = randomchoice.split('-')
             course_code = course[0].rstrip()
             course_name = course[1].rstrip()
             course_teacher = random.choice(['Mrs.', 'Mr.']) + random.choice(last_names)
