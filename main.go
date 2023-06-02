@@ -91,6 +91,7 @@ type UnitConfirmation struct {
 	Student_Grade  int    `json:"student_grade"`
 	Course_Code    string `json:"course_code"`
 	Course_Name    string `json:"course_name"`
+	Section        string `json:"student_section"`
 	Unit_Number    int    `json:"unit_number"`
 	Last_Submitted string `json:"last_submitted"`
 }
@@ -123,6 +124,7 @@ func main() {
 	route.HandleFunc("/post/user/profile/auth", authorizeUser).Methods("POST")
 
 	route.HandleFunc("/post/unit/submit", generateUnitSubmissionCode).Methods("POST")
+	route.HandleFunc("/post/unit/submit/confirm", confirmUnitSubmission).Methods("POST")
 	route.HandleFunc("/post/unit/submit/validate", acceptUnitSubmission).Methods("POST")
 	route.NotFoundHandler = http.HandlerFunc(notFound)
 

@@ -63,6 +63,47 @@ func generateUnitSubmissionCode(response http.ResponseWriter, request *http.Requ
 	json.NewEncoder(response).Encode(code)
 }
 
+func confirmUnitSubmission(response http.ResponseWriter, request *http.Request) {
+	body, err := io.ReadAll(request.Body)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var code string
+
+	unmarshal_err := json.Unmarshal(body, &code)
+	if unmarshal_err != nil {
+		fmt.Print(unmarshal_err)
+		http.Error(response, "Bad Request - Wrong Body", http.StatusBadRequest)
+		return
+	}
+
+	f, err := os.Open("units-in-submission.json")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	byteValue, _ := io.ReadAll(f)
+
+	// Write current state to slice
+	curr := []UnitSubmission{}
+	json.Unmarshal(byteValue, &curr)
+
+	for i := 0; i < len(curr); i++ {
+		if curr[i].Code == code {
+			json.NewEncoder(response).Encode(curr[i])
+			return
+		}
+	}
+
+	result := `{"status":404, "message":"Code does not exist."}`
+	var finalResult map[string]interface{}
+	json.Unmarshal([]byte(result), &finalResult)
+
+	json.NewEncoder(response).Encode(finalResult)
+	response.Header().Add("UNIT-SUBMISSION", "FAILED")
+}
+
 func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 	body, err := io.ReadAll(request.Body)
 	if err != nil {
