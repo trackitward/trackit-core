@@ -187,7 +187,7 @@ func acceptUnitSubmission(response http.ResponseWriter, request *http.Request) {
 								file.Data.Course_Data[j].UserCourse.User_Info.Units_Uncompleted_Number -= 1
 								file.Data.Unit_Data.Units_Completed += 1
 								file.Data.Unit_Data.Units_Uncompleted -= 1
-								file.Data.Course_Data[j].UserCourse.User_Info.Last_Unit_Date = time.Now().Format("01-01-1970")
+								file.Data.Course_Data[j].UserCourse.User_Info.Last_Unit_Date = time.Now().Format(time.RFC822)
 								unit_status = true
 							}
 						}
