@@ -101,6 +101,7 @@ func authorizeUser(response http.ResponseWriter, request *http.Request) {
 			http.Error(response, "Invalid Credentials", http.StatusUnauthorized)
 			return
 		}
+		response.WriteHeader(http.StatusAccepted)
 		json.NewEncoder(response).Encode(user_profile)
 	} else {
 		http.Error(response, "User Does Not Exist", http.StatusNotFound)
