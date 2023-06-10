@@ -74,7 +74,7 @@ func authorizeUser(response http.ResponseWriter, request *http.Request) {
 
 	unmarshal_err := json.Unmarshal(body, &user)
 	if unmarshal_err != nil {
-		log.Fatal(err)
+		log.Fatal(unmarshal_err)
 	}
 
 	name := string(path_to_profiles + string(user.StudentNumber) + ".json")
