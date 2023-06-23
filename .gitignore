@@ -1,3 +1,4 @@
 data/
 units-in-submission.json
 go.sum
+.DS_Store
